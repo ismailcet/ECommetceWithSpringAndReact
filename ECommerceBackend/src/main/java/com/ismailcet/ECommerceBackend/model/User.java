@@ -11,13 +11,13 @@ import java.io.Serializable;
 @Data
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "user")
+@Table(name = "users")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -33,6 +33,6 @@ public class User implements Serializable {
     private Integer age;
     @Column(name = "gender")
     private String gender;
-    @Column(name="type")
-    private String type = "user";
+    @Column(name="admin")
+    private boolean type = false;
 }
