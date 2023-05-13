@@ -57,14 +57,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     public boolean isAdmin(){
-        if(claims.get("role").equals(true)){
+        if(claims.get("role").equals("admin")){
             return true;
         }
         return false;
     }
 
     public boolean isUser(){
-        if(claims.get("role").equals(false)){
+        if(claims.get("role").equals("user")){
             return true;
         }
         return false;

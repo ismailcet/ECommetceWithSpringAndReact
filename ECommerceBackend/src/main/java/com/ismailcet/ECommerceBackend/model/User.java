@@ -33,6 +33,6 @@ public class User implements Serializable {
     private Integer age;
     @Column(name = "gender")
     private String gender;
-    @Column(name="admin")
-    private boolean type = false;
+    @Column(name="role")
+    private String role = "user";
 }
