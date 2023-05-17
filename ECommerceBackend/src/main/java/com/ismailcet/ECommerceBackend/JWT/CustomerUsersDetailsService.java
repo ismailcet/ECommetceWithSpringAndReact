@@ -21,7 +21,7 @@ public class CustomerUsersDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    private com.ismailcet.ECommerceBackend.model.User userDetail;
+    private com.ismailcet.ECommerceBackend.entity.User userDetail;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -34,7 +34,7 @@ public class CustomerUsersDetailsService implements UserDetailsService {
         }
     }
 
-    public com.ismailcet.ECommerceBackend.model.User getUserDetail(){
+    public com.ismailcet.ECommerceBackend.entity.User getUserDetail(){
         return userDetail;
     }
 }

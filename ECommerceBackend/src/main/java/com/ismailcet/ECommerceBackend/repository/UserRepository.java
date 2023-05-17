@@ -1,6 +1,6 @@
 package com.ismailcet.ECommerceBackend.repository;
 
-import com.ismailcet.ECommerceBackend.model.User;
+import com.ismailcet.ECommerceBackend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
