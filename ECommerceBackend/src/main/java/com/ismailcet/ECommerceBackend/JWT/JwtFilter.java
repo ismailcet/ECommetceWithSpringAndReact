@@ -73,4 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
     public String getCurrentUser(){
         return userName;
     }
+    public Claims getClaims(){
+        return claims;
+    }
 }

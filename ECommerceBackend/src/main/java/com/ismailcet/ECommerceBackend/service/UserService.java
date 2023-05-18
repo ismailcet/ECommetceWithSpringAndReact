@@ -155,7 +155,7 @@ public class UserService {
 
     public ResponseEntity<UserDto> updateUserByUserId(Integer id, UpdateUserRequest updateUserRequest) {
         try{
-            if(jwtFilter.isUser()){
+            if(customerUsersDetailsService.getUserDetail().getId() == id){
                 Optional<User> findUser =
                         userRepository.findById(id);
                 if(findUser.isPresent()){
