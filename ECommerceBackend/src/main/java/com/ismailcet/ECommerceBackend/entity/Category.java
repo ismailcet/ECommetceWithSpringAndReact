@@ -1,5 +1,6 @@
 package com.ismailcet.ECommerceBackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,9 +29,10 @@ public class Category implements Serializable {
     @Column(name="id")
     private Integer id;
 
-    @Column(name="name")
+    @Column(name="name", unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "categoriesProduct",fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Product> products;
 }

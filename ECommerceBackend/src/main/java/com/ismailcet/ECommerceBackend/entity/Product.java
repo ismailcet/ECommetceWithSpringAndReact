@@ -9,7 +9,9 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -26,8 +28,7 @@ public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="id")
-    private String id;
-
+    private Integer id;
     @Column(name="photo_url")
     private String photoUrl;
     @Column(name="name")
@@ -41,9 +42,9 @@ public class Product implements Serializable {
     @JoinTable(
             name = "product_size",
             joinColumns = @JoinColumn(name="product_id"),
-            inverseJoinColumns = @JoinColumn(name = "format_id")
+            inverseJoinColumns = @JoinColumn(name = "sizes_id")
     )
-    private List<Size> sizesProduct;
+    private Set<Size> sizesProduct = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -51,5 +52,5 @@ public class Product implements Serializable {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> categoriesProduct;
+    private Set<Category> categoriesProduct = new HashSet<>();
 }

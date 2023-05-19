@@ -1,5 +1,6 @@
 package com.ismailcet.ECommerceBackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.List;
 @Builder
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "format")
+@Table(name = "sizes")
 public class Size implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -27,10 +28,11 @@ public class Size implements Serializable {
     @Column(name="id")
     private Integer id;
 
-    @Column(name="name")
+    @Column(name="name", unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "sizesProduct",fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Product> products;
 
 }
