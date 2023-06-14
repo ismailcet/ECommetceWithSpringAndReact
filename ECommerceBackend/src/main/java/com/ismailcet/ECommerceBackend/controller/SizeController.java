@@ -24,41 +24,25 @@ public class SizeController {
 
     @PostMapping()
     public ResponseEntity<String> createSize(@RequestBody CreateSizeRequest createSizeRequest){
-        try{
-            return sizeService.createSize(createSizeRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(
+                    sizeService.createSize(createSizeRequest),
+                    HttpStatus.CREATED
+            );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateSizeBySizeId(@PathVariable("id") Integer id, @RequestBody UpdateSizeRequest updateSizeRequest){
-        try{
-            return sizeService.updateSizeBySizeId(id, updateSizeRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(sizeService.updateSizeBySizeId(id, updateSizeRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSizeBySizeId(@PathVariable("id") Integer id){
-        try{
-            return sizeService.deleteSizeBySizeId(id);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        sizeService.deleteSizeBySizeId(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping()
     public ResponseEntity<List<GetAllSizesResponse>> getAllSizes(){
-        try {
-            return sizeService.getAllSizes();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(sizeService.getAllSizes());
     }
 }

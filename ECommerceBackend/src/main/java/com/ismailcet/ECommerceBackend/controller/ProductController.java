@@ -27,71 +27,43 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ProductDto> createProduct(@RequestBody CreateProductRequest createProductRequest){
-        try{
-            return productService.createProduct(createProductRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return new ResponseEntity<>(
+                    productService.createProduct(createProductRequest),
+                    HttpStatus.CREATED
+            );
+
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProductByProductId(@PathVariable("id") Integer id,@RequestBody UpdateProductRequest updateProductRequest){
-        try{
-            return productService.updateProductByProductId(id, updateProductRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return ResponseEntity.ok(productService.updateProductByProductId(id, updateProductRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductByProductId(@PathVariable("id") Integer id){
-        try{
-            return productService.deleteProductByProductId(id);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        productService.deleteProductByProductId(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetProductResponse> getProductByProductId(@PathVariable("id") Integer id){
-        try{
-            return productService.getProductByProductId(id);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(productService.getProductByProductId(id));
     }
 
     @GetMapping()
     public ResponseEntity<List<GetAllProductsResponse>> getAllProduct(){
-        try{
-            return productService.getAllProduct();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(productService.getAllProduct());
     }
 
     @PutMapping("/{productId}/size/{sizeId}")
     public ResponseEntity<ProductDto> addSizeToProduct(@PathVariable("productId") Integer productId, @PathVariable("sizeId") Integer sizeId){
-        try{
-            return productService.addSizeToProduct(productId, sizeId);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(productService.addSizeToProduct(productId, sizeId));
     }
 
     @PutMapping("/{productId}/category/{categoryId}")
     public ResponseEntity<ProductDto> addCategoryToProduct(@PathVariable("productId") Integer productId, @PathVariable("categoryId")Integer categoryId){
-        try{
-            return productService.addCategoryToProduct(productId, categoryId);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(productService.addCategoryToProduct(productId, categoryId));
     }
 }

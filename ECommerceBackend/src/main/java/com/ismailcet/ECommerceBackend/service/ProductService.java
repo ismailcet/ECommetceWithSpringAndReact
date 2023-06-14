@@ -11,6 +11,8 @@ import com.ismailcet.ECommerceBackend.dto.response.GetProductResponse;
 import com.ismailcet.ECommerceBackend.entity.Category;
 import com.ismailcet.ECommerceBackend.entity.Product;
 import com.ismailcet.ECommerceBackend.entity.Size;
+import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
+import com.ismailcet.ECommerceBackend.exception.ProductNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.CategoryRepository;
 import com.ismailcet.ECommerceBackend.repository.ProductRepository;
 import com.ismailcet.ECommerceBackend.repository.SizeRepository;
@@ -44,7 +46,7 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public ResponseEntity<ProductDto> createProduct(CreateProductRequest createProductRequest) {
+    public ProductDto createProduct(CreateProductRequest createProductRequest) {
         try{
             if(jwtFilter.isAdmin()){
                 Product product = Product.builder()
@@ -54,16 +56,15 @@ public class ProductService {
                         .price(createProductRequest.getPrice())
                         .build();
                 productRepository.save(product);
-                return new ResponseEntity<>(productDtoConverter.convert(product), HttpStatus.CREATED);
+                return productDtoConverter.convert(product);
             }
-            return new ResponseEntity<>(null,HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Uauthenticated Access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<List<GetAllProductsResponse>> getAllProduct() {
+    public List<GetAllProductsResponse> getAllProduct() {
         try{
             List<GetAllProductsResponse> products =
                         productRepository.findAll().stream()
@@ -76,14 +77,13 @@ public class ProductService {
                                         p.getSizesProduct(),
                                         p.getCategoriesProduct()))
                                 .collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
+            return products;
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<ProductDto> addSizeToProduct(Integer productId, Integer sizeId) {
+    public ProductDto addSizeToProduct(Integer productId, Integer sizeId) {
         try{
             if(jwtFilter.isAdmin()){
                 Set<Size> sizes = null;
@@ -94,16 +94,15 @@ public class ProductService {
                 sizes.add(size);
                 product.setSizesProduct(sizes);
                 productRepository.save(product);
-                return new ResponseEntity<>(productDtoConverter.convert(product),HttpStatus.OK);
+                return productDtoConverter.convert(product);
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthenticated Access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<ProductDto> addCategoryToProduct(Integer productId, Integer categoryId) {
+    public ProductDto addCategoryToProduct(Integer productId, Integer categoryId) {
         try{
             if(jwtFilter.isAdmin()){
                 Set<Category> categories = null;
@@ -114,16 +113,15 @@ public class ProductService {
                 categories.add(category);
                 product.setCategoriesProduct(categories);
                 productRepository.save(product);
-                return new ResponseEntity<>(productDtoConverter.convert(product), HttpStatus.OK);
+                return productDtoConverter.convert(product);
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthenticated Access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+           throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<ProductDto> updateProductByProductId(Integer id, UpdateProductRequest updateProductRequest) {
+    public ProductDto updateProductByProductId(Integer id, UpdateProductRequest updateProductRequest) {
         try{
             if(jwtFilter.isAdmin()){
                 Product product =
@@ -134,36 +132,34 @@ public class ProductService {
                     product.setColor(updateProductRequest.getColor());
                     product.setPhotoUrl(updateProductRequest.getPhotoUrl());
                     productRepository.save(product);
-                    return new ResponseEntity<>(productDtoConverter.convert(product), HttpStatus.OK);
+                    return productDtoConverter.convert(product);
                 }
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                throw new ProductNotFoundException("Product Id does not exist");
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthenticated Access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<String> deleteProductByProductId(Integer id) {
+    public String deleteProductByProductId(Integer id) {
         try{
             if(jwtFilter.isAdmin()){
                 Product product =
                         productRepository.findById(id).get();
                 if(!Objects.isNull(product)){
                     productRepository.deleteById(id);
-                    return SystemUtils.getResponseEntity("Product Successfully Deleted" , HttpStatus.OK);
+                    return "Product Successfully Deleted";
                 }
-                return SystemUtils.getResponseEntity("Product Id does not exist !",HttpStatus.BAD_REQUEST);
+                throw new ProductNotFoundException("Product Id does not exist !");
             }
-            return SystemUtils.getResponseEntity("Unauthorized Access ! ",HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthorized Access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+           throw ex;
         }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<GetProductResponse> getProductByProductId(Integer id) {
+    public GetProductResponse getProductByProductId(Integer id) {
         try{
             Optional<Product> product =
                     productRepository.findById(id);
@@ -177,12 +173,11 @@ public class ProductService {
                         .categoriesProduct(product.get().getCategoriesProduct())
                         .sizesProduct(product.get().getSizesProduct())
                         .build();
-                return new ResponseEntity<>(p, HttpStatus.OK);
+                return p;
             }
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            throw new ProductNotFoundException("Product Id does not exist !");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

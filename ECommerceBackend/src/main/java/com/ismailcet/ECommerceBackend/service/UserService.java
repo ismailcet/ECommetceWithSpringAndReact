@@ -12,6 +12,8 @@ import com.ismailcet.ECommerceBackend.dto.request.UpdateUserRequest;
 import com.ismailcet.ECommerceBackend.dto.response.GetAllUsersResponse;
 import com.ismailcet.ECommerceBackend.dto.response.GetUserByUserId;
 import com.ismailcet.ECommerceBackend.entity.User;
+import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
+import com.ismailcet.ECommerceBackend.exception.UserNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.UserRepository;
 import com.ismailcet.ECommerceBackend.utils.PasswordUtils;
 import com.ismailcet.ECommerceBackend.utils.SystemUtils;
@@ -47,7 +49,7 @@ public class UserService {
         this.userDtoConverter = userDtoConverter;
     }
 
-    public ResponseEntity<UserDto> register(CreateUserRequest createUserRequest){
+    public UserDto register(CreateUserRequest createUserRequest){
         try{
             User userTest = userRepository.findByEmail(createUserRequest.getEmail());
             if(Objects.isNull(userTest)){
@@ -63,17 +65,16 @@ public class UserService {
                                 .build();
 
                 userRepository.save(user);
-                return SystemUtils.getResponseEntityForUser(userDtoConverter.convert(user) , HttpStatus.OK);
+                return userDtoConverter.convert(user);
             }else{
-                return SystemUtils.getResponseEntityForUser(null,HttpStatus.BAD_REQUEST);
+                throw new AuthenticationException("Unauthorized Access ! ");
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return SystemUtils.getResponseEntityForUser(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<String> login(LoginUserRequest loginUserRequest){
+    public String login(LoginUserRequest loginUserRequest){
         log.info("Inside Login {}" + loginUserRequest);
         try{
             User user = userRepository.findByEmail(loginUserRequest.getEmail());
@@ -85,24 +86,22 @@ public class UserService {
                                 );
                         if(auth.isAuthenticated()){
 
-                            return new ResponseEntity<String>(
-                                    "{\"token\":\"" +
+                            return "{\"token\":\"" +
                                             jwtUtil.generateToken(customerUsersDetailsService.getUserDetail().getEmail(),customerUsersDetailsService.getUserDetail().getRole())
-                                    +"\"}",HttpStatus.OK);
+                                    +"\"}";
                         }
-                        return SystemUtils.getResponseEntity("wrong",HttpStatus.BAD_REQUEST);
+                        throw new UserNotFoundException("Wrong Credentials ! ");
                     }else{
-                        return SystemUtils.getResponseEntity("Wrong Password",HttpStatus.BAD_REQUEST);
+                        throw new UserNotFoundException("Wrong Password");
                     }
             }
-            return SystemUtils.getResponseEntity("Wrong Email",HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException("Wrong Email ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<List<GetAllUsersResponse>> getAllUser(){
+    public List<GetAllUsersResponse> getAllUser(){
         try{
             List<GetAllUsersResponse> users = new ArrayList<>();
             if(jwtFilter.isAdmin()){
@@ -117,16 +116,15 @@ public class UserService {
                                         .role(user.getRole())
                                         .build())
                                 .collect(Collectors.toList());
-                return new ResponseEntity<>(users,HttpStatus.OK);
+                return users;
             }
-            return new ResponseEntity<>(users,HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("unauthorized access !");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<GetUserByUserId> getUserByUserId(Integer id) {
+    public GetUserByUserId getUserByUserId(Integer id) {
         try{
             if(jwtFilter.isUser()){
                 Optional<User> findUser =
@@ -142,18 +140,17 @@ public class UserService {
                                     .age(findUser.get().getAge())
                                     .role(findUser.get().getRole())
                                     .build();
-                    return new ResponseEntity<>(user, HttpStatus.OK);
+                    return user;
                 }
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                throw new UserNotFoundException("User Not Found ! ");
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("unauthorized access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(new GetUserByUserId(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<UserDto> updateUserByUserId(Integer id, UpdateUserRequest updateUserRequest) {
+    public UserDto updateUserByUserId(Integer id, UpdateUserRequest updateUserRequest) {
         try{
             if(customerUsersDetailsService.getUserDetail().getId() == id){
                 Optional<User> findUser =
@@ -166,32 +163,30 @@ public class UserService {
                     findUser.get().setGender(updateUserRequest.getGender());
                     findUser.get().setAge(updateUserRequest.getAge());
                     userRepository.save(findUser.get());
-                    return new ResponseEntity<>(userDtoConverter.convert(findUser.get()),HttpStatus.OK);
+                    return userDtoConverter.convert(findUser.get());
                 }
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                throw new UserNotFoundException("User Not Found ! ");
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("unauthorized access ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<String> deleteUserByUserId(Integer id) {
+    public String deleteUserByUserId(Integer id) {
         try{
             if(jwtFilter.isAdmin()){
                 Optional<User> user =
                         userRepository.findById(id);
                 if(user.isPresent()){
                     userRepository.deleteById(id);
-                    return new ResponseEntity<>("User Successfully Deleted !" ,HttpStatus.OK);
+                    return "User Successfully Deleted !";
                 }
-                return new ResponseEntity<>("User Id does not id", HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException("User Id does not id");
             }
-            return new ResponseEntity<>("Unauthorized access.", HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthorized access. ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

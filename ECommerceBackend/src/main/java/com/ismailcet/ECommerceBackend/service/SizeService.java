@@ -6,6 +6,8 @@ import com.ismailcet.ECommerceBackend.dto.request.CreateSizeRequest;
 import com.ismailcet.ECommerceBackend.dto.request.UpdateSizeRequest;
 import com.ismailcet.ECommerceBackend.dto.response.GetAllSizesResponse;
 import com.ismailcet.ECommerceBackend.entity.Size;
+import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
+import com.ismailcet.ECommerceBackend.exception.SizeNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.SizeRepository;
 import com.ismailcet.ECommerceBackend.utils.SystemUtils;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,7 @@ public class SizeService {
         this.jwtFilter = jwtFilter;
     }
 
-    public ResponseEntity<String> createSize(CreateSizeRequest createSizeRequest) {
+    public String createSize(CreateSizeRequest createSizeRequest) {
         try{
             if(jwtFilter.isAdmin()){
                 Size size = sizeRepository.findByName(createSizeRequest.getName());
@@ -37,18 +39,17 @@ public class SizeService {
                             .build();
                     sizeRepository.save(newCat);
 
-                    return SystemUtils.getResponseEntity("Size Successfully added ! " ,HttpStatus.CREATED);
+                    return "Size Successfully added ! ";
                 }
-                return SystemUtils.getResponseEntity("Size Name already exist", HttpStatus.BAD_REQUEST);
+                throw new SizeNotFoundException("Size Name already exist");
             }
-            return SystemUtils.getResponseEntity("Unauthorized access.", HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthorized access.");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<String> updateSizeBySizeId(Integer id, UpdateSizeRequest updateSizeRequest) {
+    public String updateSizeBySizeId(Integer id, UpdateSizeRequest updateSizeRequest) {
         try{
             if(jwtFilter.isAdmin()){
                 Optional<Size> size =
@@ -56,47 +57,44 @@ public class SizeService {
                 if(size.isPresent()){
                     size.get().setName(updateSizeRequest.getName());
                     sizeRepository.save(size.get());
-                    return SystemUtils.getResponseEntity("Size Successfully Updated ! ", HttpStatus.OK);
+                    throw new SizeNotFoundException("Size Successfully Updated ! ");
                 }
-                return SystemUtils.getResponseEntity("Size Id does not exist ! " , HttpStatus.BAD_REQUEST);
+                throw new SizeNotFoundException("Size Id does not exist ! ");
             }
-            return SystemUtils.getResponseEntity("Unauthorized access.", HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthorized access.");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<String> deleteSizeBySizeId(Integer id) {
+    public String deleteSizeBySizeId(Integer id) {
         try{
             if(jwtFilter.isAdmin()){
                 Optional<Size> size = sizeRepository.findById(id);
                 if(size.isPresent()){
                     sizeRepository.deleteById(id);
-                    return SystemUtils.getResponseEntity("Size Successfully Deleted", HttpStatus.OK);
+                    return "Size Successfully Deleted";
                 }
-                return SystemUtils.getResponseEntity("Size Id does not exist", HttpStatus.BAD_REQUEST);
+                throw new SizeNotFoundException("Size Id does not exist");
             }
-            return SystemUtils.getResponseEntity("Unauthorized access.", HttpStatus.UNAUTHORIZED);
+            throw new AuthenticationException("Unauthorized access.");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ResponseEntity<List<GetAllSizesResponse>> getAllSizes() {
+    public List<GetAllSizesResponse> getAllSizes() {
         try{
             if(jwtFilter.isAdmin()){
                 List<GetAllSizesResponse> sizes =
                         sizeRepository.findAll().stream()
                                 .map(s->new GetAllSizesResponse(s.getId(),s.getName()))
                                 .collect(Collectors.toList());
-                return new ResponseEntity<>(sizes, HttpStatus.OK);
+                return sizes;
             }
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            throw new SizeNotFoundException("Size Not Found ! ");
         }catch (Exception ex){
-            ex.printStackTrace();
+            throw ex;
         }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

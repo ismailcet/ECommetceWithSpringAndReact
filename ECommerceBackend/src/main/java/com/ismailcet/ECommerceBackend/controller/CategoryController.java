@@ -26,41 +26,26 @@ public class CategoryController {
 
     @PostMapping()
     public ResponseEntity<String> createCategory(@RequestBody CreateCategoryRequest createCategoryRequest){
-        try{
-            return categoryService.createCategory(createCategoryRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return new ResponseEntity<>(categoryService.createCategory(createCategoryRequest),
+                    HttpStatus.CREATED);
+
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateCategoryByCategoryId(@PathVariable("id") Integer id, @RequestBody UpdateCategoryRequest updateCategoryRequest){
-        try{
-            return categoryService.updateCategoryByCategoryId(id, updateCategoryRequest);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return ResponseEntity.ok(categoryService.updateCategoryByCategoryId(id, updateCategoryRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategoryByCategoryId(@PathVariable("id") Integer id){
-        try{
-            return categoryService.deleteCategoryByCategoryId(id);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return SystemUtils.getResponseEntity(SystemConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        categoryService.deleteCategoryByCategoryId(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping()
     public ResponseEntity<List<GetAllCategoriesResponse>> getAllCategories(){
-        try{
-            return categoryService.getAllCategories();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }
