@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class CreateProductRequest {
     private Double price;
     private String color;
     private String photoUrl;
+    private Integer stock;
 }

@@ -1,6 +1,7 @@
 package com.ismailcet.ECommerceBackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,8 +32,8 @@ public class Size implements Serializable {
     @Column(name="name", unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "sizesProduct",fetch = FetchType.LAZY)
     @JsonIgnore
+    @ManyToMany(mappedBy = "sizesProduct")
     private List<Product> products;
 
 }

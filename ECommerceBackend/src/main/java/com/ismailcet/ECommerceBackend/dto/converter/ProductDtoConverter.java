@@ -13,6 +13,7 @@ public class ProductDtoConverter {
                 .color(product.getColor())
                 .photoUrl(product.getPhotoUrl())
                 .price(product.getPrice())
+                .stock(product.getStock())
                 .categoriesProduct(product.getCategoriesProduct())
                 .sizesProduct(product.getSizesProduct())
                 .build();

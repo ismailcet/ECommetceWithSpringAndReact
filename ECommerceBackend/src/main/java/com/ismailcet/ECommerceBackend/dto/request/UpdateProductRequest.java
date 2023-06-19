@@ -14,4 +14,5 @@ public class UpdateProductRequest {
     private Double price;
     private String color;
     private String photoUrl;
+    private Integer stock;
 }

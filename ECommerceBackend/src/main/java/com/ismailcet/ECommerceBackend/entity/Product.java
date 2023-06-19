@@ -37,12 +37,15 @@ public class Product implements Serializable {
     private Double price;
     @Column(name="color")
     private String color;
+    @Column(name="stock")
+    private Integer stock;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "product_size",
             joinColumns = @JoinColumn(name="product_id"),
-            inverseJoinColumns = @JoinColumn(name = "sizes_id")
+            inverseJoinColumns = @JoinColumn(name = "size_id")
     )
     private Set<Size> sizesProduct = new HashSet<>();
 

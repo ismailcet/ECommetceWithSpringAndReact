@@ -12,7 +12,9 @@ import com.ismailcet.ECommerceBackend.entity.Category;
 import com.ismailcet.ECommerceBackend.entity.Product;
 import com.ismailcet.ECommerceBackend.entity.Size;
 import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
+import com.ismailcet.ECommerceBackend.exception.CategoryNotFoundException;
 import com.ismailcet.ECommerceBackend.exception.ProductNotFoundException;
+import com.ismailcet.ECommerceBackend.exception.SizeNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.CategoryRepository;
 import com.ismailcet.ECommerceBackend.repository.ProductRepository;
 import com.ismailcet.ECommerceBackend.repository.SizeRepository;
@@ -22,10 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,11 +53,12 @@ public class ProductService {
                         .photoUrl(createProductRequest.getPhotoUrl())
                         .color(createProductRequest.getColor())
                         .price(createProductRequest.getPrice())
+                        .stock(createProductRequest.getStock())
                         .build();
                 productRepository.save(product);
                 return productDtoConverter.convert(product);
             }
-            throw new AuthenticationException("Uauthenticated Access ! ");
+            throw new AuthenticationException("Unauthenticated Access ! ");
         }catch (Exception ex){
             throw ex;
         }
@@ -74,6 +74,7 @@ public class ProductService {
                                         p.getColor(),
                                         p.getPrice(),
                                         p.getPhotoUrl(),
+                                        p.getStock(),
                                         p.getSizesProduct(),
                                         p.getCategoriesProduct()))
                                 .collect(Collectors.toList());
@@ -86,10 +87,11 @@ public class ProductService {
     public ProductDto addSizeToProduct(Integer productId, Integer sizeId) {
         try{
             if(jwtFilter.isAdmin()){
-                Set<Size> sizes = null;
-                Size size = sizeRepository.findById(sizeId).get();
+                Set<Size> sizes = new HashSet<>();
 
+                Size size = sizeRepository.findById(sizeId).get();
                 Product product = productRepository.findById(productId).get();
+
                 sizes = product.getSizesProduct();
                 sizes.add(size);
                 product.setSizesProduct(sizes);
@@ -131,6 +133,7 @@ public class ProductService {
                     product.setPrice(updateProductRequest.getPrice());
                     product.setColor(updateProductRequest.getColor());
                     product.setPhotoUrl(updateProductRequest.getPhotoUrl());
+                    product.setStock(updateProductRequest.getStock());
                     productRepository.save(product);
                     return productDtoConverter.convert(product);
                 }
@@ -170,6 +173,7 @@ public class ProductService {
                         .price(product.get().getPrice())
                         .color(product.get().getColor())
                         .photoUrl(product.get().getPhotoUrl())
+                        .stock(product.get().getStock())
                         .categoriesProduct(product.get().getCategoriesProduct())
                         .sizesProduct(product.get().getSizesProduct())
                         .build();

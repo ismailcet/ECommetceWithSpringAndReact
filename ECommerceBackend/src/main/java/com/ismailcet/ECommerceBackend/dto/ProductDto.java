@@ -21,6 +21,7 @@ public class ProductDto {
     private String name;
     private Double price;
     private String color;
+    private Integer stock;
     private Set<Size> sizesProduct = new HashSet<>();
     private Set<Category> categoriesProduct = new HashSet<>();
 }
