@@ -2,6 +2,8 @@ package com.ismailcet.ECommerceBackend.controller;
 
 import com.ismailcet.ECommerceBackend.dto.OrderDto;
 import com.ismailcet.ECommerceBackend.dto.request.CreateOrderRequest;
+import com.ismailcet.ECommerceBackend.dto.request.UpdateCargoStatusRequest;
+import com.ismailcet.ECommerceBackend.entity.CargoStatus;
 import com.ismailcet.ECommerceBackend.entity.Order;
 import com.ismailcet.ECommerceBackend.service.OrderService;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,25 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> getAllOrders(){
         return ResponseEntity.ok(
                 orderService.getAllOrders()
+        );
+    }
+    @GetMapping("/{userId}/get")
+    public ResponseEntity<List<OrderDto>> getAllOrdersByUserId(@PathVariable("userId") Integer userId){
+        return ResponseEntity.ok(
+                orderService.getAllOrdersByUserId(userId)
+        );
+    }
+    @GetMapping("/get/{id}")
+    public ResponseEntity<OrderDto> getOrderByOrderId(@PathVariable("id") Integer id){
+        return ResponseEntity.ok(
+                orderService.getOrderByOrderId(id)
+        );
+    }
+    @PutMapping("/change/cargo/{orderId}")
+    public ResponseEntity<CargoStatus> updateCargoStatusByOrderId(@PathVariable("orderId") Integer orderId, @RequestBody UpdateCargoStatusRequest cargoStatus){
+        System.out.println(cargoStatus);
+        return ResponseEntity.ok(
+                orderService.updateCargoStatusByOrderId(orderId, cargoStatus)
         );
     }
 }
