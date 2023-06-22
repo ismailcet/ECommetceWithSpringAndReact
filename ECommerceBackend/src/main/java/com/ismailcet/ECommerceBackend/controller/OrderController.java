@@ -6,6 +6,7 @@ import com.ismailcet.ECommerceBackend.dto.request.UpdateCargoStatusRequest;
 import com.ismailcet.ECommerceBackend.entity.CargoStatus;
 import com.ismailcet.ECommerceBackend.entity.Order;
 import com.ismailcet.ECommerceBackend.service.OrderService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
-
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -52,6 +52,13 @@ public class OrderController {
         System.out.println(cargoStatus);
         return ResponseEntity.ok(
                 orderService.updateCargoStatusByOrderId(orderId, cargoStatus)
+        );
+    }
+    @DeleteMapping("/cancel/{orderId}")
+    public ResponseEntity<String> cancelOrderByOrderId(@PathVariable("orderId") Integer orderId){
+        return new ResponseEntity<>(
+          orderService.cancelOrderByOrderId(orderId),
+          HttpStatus.NO_CONTENT
         );
     }
 }

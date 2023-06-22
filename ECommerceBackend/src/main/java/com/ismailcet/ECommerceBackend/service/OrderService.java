@@ -17,9 +17,12 @@ import com.ismailcet.ECommerceBackend.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +53,7 @@ public class OrderService {
 
                 User user = userRepository.findById(createOrderRequest.getUserId()).orElseThrow(() -> new UserNotFoundException("User Not Found ! "));
                 order.setUser(user);
+                order.setOrderNumber(generateOrderNumber(user.getId()));
 
                 List<OrderItem> orderItems = new ArrayList<>();
                 for(OrderItemDto orderItemDto:createOrderRequest.getOrderItems()){
@@ -71,6 +75,25 @@ public class OrderService {
         }catch (Exception ex){
             throw ex;
         }
+    }
+    private String generateOrderNumber(Integer userId){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmssddMMyyyy");
+        String currentDateTime = now.format(formatter);
+        String randomDigits = generateNumberDigits(4);
+        String combination = userId + "-" + currentDateTime + "-" + randomDigits;
+
+        return combination;
+    }
+
+    private String generateNumberDigits(int i) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(i);
+
+        for(int j = 0; j<i;j++){
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
     }
 
     public List<OrderDto> getAllOrders() {
@@ -132,6 +155,27 @@ public class OrderService {
                 order.setCargoStatus(cargoStatus.getCargoStatus());
                 orderRepository.save(order);
                 return order.getCargoStatus();
+            }else{
+                throw new AuthenticationException("Invalid Access ! ");
+            }
+        }catch (Exception ex){
+            throw ex;
+        }
+    }
+
+    public String cancelOrderByOrderId(Integer orderId) {
+        try{
+            Order order = orderRepository
+                    .findById(orderId)
+                    .orElseThrow(
+                            () -> new OrderNotFoundException("Order Not Found !"));
+            if(jwtFilter.getCurrentUser().equals(order.getUser().getEmail()) || jwtFilter.isAdmin()){
+                if(order.getCargoStatus() != CargoStatus.IN_TRANSIT){
+                    orderRepository.deleteById(orderId);
+                    return "Order Successfully Canceled";
+                }else{
+                    throw new OrderNotFoundException("Your Order is on its way ! ");
+                }
             }else{
                 throw new AuthenticationException("Invalid Access ! ");
             }

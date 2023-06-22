@@ -23,6 +23,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+    @Column(name = "order_number", nullable = true)
+    private String orderNumber;
     @Column(name = "created_date")
     private Date createdDate = new Date();
     @Column(name = "status")
