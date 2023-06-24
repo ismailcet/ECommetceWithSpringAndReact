@@ -1,7 +1,6 @@
 package com.ismailcet.ECommerceBackend.service;
 
 import com.ismailcet.ECommerceBackend.JWT.JwtFilter;
-import com.ismailcet.ECommerceBackend.constants.SystemConstants;
 import com.ismailcet.ECommerceBackend.dto.ProductDto;
 import com.ismailcet.ECommerceBackend.dto.converter.ProductDtoConverter;
 import com.ismailcet.ECommerceBackend.dto.request.CreateProductRequest;
@@ -12,18 +11,15 @@ import com.ismailcet.ECommerceBackend.entity.Category;
 import com.ismailcet.ECommerceBackend.entity.Product;
 import com.ismailcet.ECommerceBackend.entity.Size;
 import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
-import com.ismailcet.ECommerceBackend.exception.CategoryNotFoundException;
 import com.ismailcet.ECommerceBackend.exception.ProductNotFoundException;
-import com.ismailcet.ECommerceBackend.exception.SizeNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.CategoryRepository;
 import com.ismailcet.ECommerceBackend.repository.ProductRepository;
 import com.ismailcet.ECommerceBackend.repository.SizeRepository;
-import com.ismailcet.ECommerceBackend.utils.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +32,7 @@ public class ProductService {
     private final ProductDtoConverter productDtoConverter;
     private final SizeRepository sizeRepository;
     private final CategoryRepository categoryRepository;
+    private final String FOLDER_PATH = "/Users/ismailcetin/Desktop/Full Stack/Ecommerce/ECommetceWithSpringAndReact/images";
 
     public ProductService(ProductRepository productRepository, JwtFilter jwtFilter, ProductDtoConverter productDtoConverter, SizeRepository sizeRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
@@ -183,5 +180,10 @@ public class ProductService {
         }catch (Exception ex){
             throw ex;
         }
+    }
+
+    public String addImagesToProduct(Integer id, MultipartFile file) throws IOException {
+
+        return "Success" + file.getOriginalFilename();
     }
 }

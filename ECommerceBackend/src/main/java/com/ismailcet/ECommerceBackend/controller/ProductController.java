@@ -12,7 +12,9 @@ import com.ismailcet.ECommerceBackend.utils.SystemUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -65,5 +67,12 @@ public class ProductController {
     @PutMapping("/{productId}/category/{categoryId}")
     public ResponseEntity<ProductDto> addCategoryToProduct(@PathVariable("productId") Integer productId, @PathVariable("categoryId")Integer categoryId){
             return ResponseEntity.ok(productService.addCategoryToProduct(productId, categoryId));
+    }
+
+    @PostMapping("/{productId}/images/add")
+    public ResponseEntity<String> addImagesToProduct(@PathVariable("productId") Integer id, @RequestParam("images") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(
+                productService.addImagesToProduct(id, file)
+        );
     }
 }

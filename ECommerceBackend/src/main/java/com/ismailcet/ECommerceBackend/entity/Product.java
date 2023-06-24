@@ -56,4 +56,8 @@ public class Product implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categoriesProduct = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "product_id")
+    private List<Image> images;
 }
