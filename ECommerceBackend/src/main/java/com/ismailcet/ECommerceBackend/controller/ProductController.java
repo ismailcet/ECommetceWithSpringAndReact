@@ -77,10 +77,4 @@ public class ProductController {
                 productService.addImagesToProduct(id, file)
         );
     }
-    @GetMapping("/{productId}/images/get")
-    public ResponseEntity<List<ProductImage>> getImagesLink(@PathVariable("productId") Integer id){
-        return ResponseEntity.ok(
-          productService.getImagesLink(id)
-        );
-    }
 }

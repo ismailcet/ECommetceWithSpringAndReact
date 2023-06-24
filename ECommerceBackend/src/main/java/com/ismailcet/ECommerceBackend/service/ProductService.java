@@ -189,9 +189,4 @@ public class ProductService {
         return "Success " + file.getOriginalFilename();
     }
 
-    public List<ProductImage> getImagesLink(Integer id) {
-        Product product = productRepository.findById(id).get();
-
-        return product.getProductImageList();
-    }
 }

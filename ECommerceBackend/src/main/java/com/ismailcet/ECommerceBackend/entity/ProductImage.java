@@ -1,5 +1,6 @@
 package com.ismailcet.ECommerceBackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class ProductImage {
     private String file;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 }

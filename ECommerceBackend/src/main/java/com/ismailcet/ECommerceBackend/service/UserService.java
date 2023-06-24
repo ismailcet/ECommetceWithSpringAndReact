@@ -67,7 +67,7 @@ public class UserService {
                 userRepository.save(user);
                 return userDtoConverter.convert(user);
             }else{
-                throw new AuthenticationException("Unauthorized Access ! ");
+                throw new UserNotFoundException("Email already is taken ! ");
             }
         }catch (Exception ex){
             throw ex;
