@@ -1,5 +1,6 @@
 package com.ismailcet.ECommerceBackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +23,9 @@ import java.util.Set;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "products")
-public class Product implements Serializable {
+public class Product {
 
-    private static final long serialVersionUID = 1L;
+    //private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +59,6 @@ public class Product implements Serializable {
     )
     private Set<Category> categoriesProduct = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "product_id")
-    private List<Image> images;
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private List<ProductImage> productImageList;
 }

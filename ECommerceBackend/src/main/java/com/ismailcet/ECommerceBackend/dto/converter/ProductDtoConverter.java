@@ -16,6 +16,7 @@ public class ProductDtoConverter {
                 .stock(product.getStock())
                 .categoriesProduct(product.getCategoriesProduct())
                 .sizesProduct(product.getSizesProduct())
+                .productImageList(product.getProductImageList())
                 .build();
         return productDto;
     }

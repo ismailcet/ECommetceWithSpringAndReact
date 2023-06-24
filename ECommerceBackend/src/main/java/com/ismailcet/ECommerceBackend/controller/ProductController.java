@@ -7,6 +7,7 @@ import com.ismailcet.ECommerceBackend.dto.request.UpdateProductRequest;
 import com.ismailcet.ECommerceBackend.dto.response.GetAllProductsResponse;
 import com.ismailcet.ECommerceBackend.dto.response.GetProductResponse;
 import com.ismailcet.ECommerceBackend.entity.Product;
+import com.ismailcet.ECommerceBackend.entity.ProductImage;
 import com.ismailcet.ECommerceBackend.service.ProductService;
 import com.ismailcet.ECommerceBackend.utils.SystemUtils;
 import org.springframework.http.HttpStatus;
@@ -50,12 +51,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetProductResponse> getProductByProductId(@PathVariable("id") Integer id){
+    public ResponseEntity<ProductDto> getProductByProductId(@PathVariable("id") Integer id){
             return ResponseEntity.ok(productService.getProductByProductId(id));
     }
 
     @GetMapping()
-    public ResponseEntity<List<GetAllProductsResponse>> getAllProduct(){
+    public ResponseEntity<List<ProductDto>> getAllProduct(){
+        System.out.println("Girdi");
             return ResponseEntity.ok(productService.getAllProduct());
     }
 
@@ -73,6 +75,12 @@ public class ProductController {
     public ResponseEntity<String> addImagesToProduct(@PathVariable("productId") Integer id, @RequestParam("images") MultipartFile file) throws IOException {
         return ResponseEntity.ok(
                 productService.addImagesToProduct(id, file)
+        );
+    }
+    @GetMapping("/{productId}/images/get")
+    public ResponseEntity<List<ProductImage>> getImagesLink(@PathVariable("productId") Integer id){
+        return ResponseEntity.ok(
+          productService.getImagesLink(id)
         );
     }
 }
