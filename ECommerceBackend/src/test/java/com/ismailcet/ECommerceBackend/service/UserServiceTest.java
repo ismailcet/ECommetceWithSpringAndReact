@@ -6,14 +6,20 @@ import com.ismailcet.ECommerceBackend.JWT.JwtUtil;
 import com.ismailcet.ECommerceBackend.dto.UserDto;
 import com.ismailcet.ECommerceBackend.dto.converter.UserDtoConverter;
 import com.ismailcet.ECommerceBackend.dto.request.CreateUserRequest;
+import com.ismailcet.ECommerceBackend.dto.request.LoginUserRequest;
 import com.ismailcet.ECommerceBackend.entity.User;
 import com.ismailcet.ECommerceBackend.exception.UserNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.UserRepository;
+import com.ismailcet.ECommerceBackend.utils.PasswordUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -121,6 +127,39 @@ class UserServiceTest {
         assertEquals(excepted.getMessage(), actual.getMessage());
 
         verify(userRepository).findByEmail(any(String.class));
+    }
+
+    @Test
+    public void testLogin_whenEmailAndPasswordAreCorrect_shouldReturnStringToken(){
+        LoginUserRequest given = LoginUserRequest.builder()
+                .email("test-email")
+                .password("test-password")
+                .build();
+
+        User user = User.builder()
+                .id(1)
+                .email("test-email")
+                .name("text-name")
+                .surname("text-surname")
+                .age(19)
+                .role("test-role")
+                .password(PasswordUtils.hashPassword("test-password"))
+                .build();
+        TestingAuthenticationToken token =
+                new TestingAuthenticationToken(given.getEmail(), given.getPassword());
+        token.setAuthenticated(true);
+
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(given.getEmail(), given.getPassword());
+        String expected = "{\"token\":\"test-token\"}";
+
+        when(userRepository.findByEmail(given.getEmail())).thenReturn(user);
+        when(authenticationManager.authenticate(auth)).thenReturn(token);
+        System.out.println(customerUsersDetailsService.getUserDetail());
+        when(jwtUtil.generateToken(user.getEmail(), user.getRole())).thenReturn("test-token");
+        String test = userService.login(given);
+
+
     }
 
 }
