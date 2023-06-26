@@ -1,14 +1,12 @@
 package com.ismailcet.ECommerceBackend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class UserDto {
     private Integer id;
     private String email;

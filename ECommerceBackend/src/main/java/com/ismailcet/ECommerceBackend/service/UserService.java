@@ -101,20 +101,12 @@ public class UserService {
         }
     }
 
-    public List<GetAllUsersResponse> getAllUser(){
+    public List<UserDto> getAllUser(){
         try{
-            List<GetAllUsersResponse> users = new ArrayList<>();
+            List<UserDto> users = new ArrayList<>();
             if(jwtFilter.isAdmin()){
                 users = userRepository.findAll().stream()
-                                .map(user->GetAllUsersResponse.builder()
-                                        .id(user.getId())
-                                        .email(user.getEmail())
-                                        .name(user.getName())
-                                        .surname(user.getEmail())
-                                        .gender(user.getGender())
-                                        .age(user.getAge())
-                                        .role(user.getRole())
-                                        .build())
+                                .map(user->userDtoConverter.convert(user))
                                 .collect(Collectors.toList());
                 return users;
             }
@@ -124,27 +116,20 @@ public class UserService {
         }
     }
 
-    public GetUserByUserId getUserByUserId(Integer id) {
+    public UserDto getUserByUserId(Integer id) {
         try{
-            if(jwtFilter.isUser()){
                 Optional<User> findUser =
                         userRepository.findById(id);
                 if(findUser.isPresent()){
-                    GetUserByUserId user =
-                            GetUserByUserId.builder()
-                                    .id(findUser.get().getId())
-                                    .email(findUser.get().getEmail())
-                                    .name(findUser.get().getName())
-                                    .surname(findUser.get().getSurname())
-                                    .gender(findUser.get().getGender())
-                                    .age(findUser.get().getAge())
-                                    .role(findUser.get().getRole())
-                                    .build();
-                    return user;
+                    if(jwtFilter.getCurrentUser().equalsIgnoreCase(findUser.get().getEmail())){
+                        UserDto user =
+                                userDtoConverter.convert(findUser.get());
+                        return user;
+                    }else{
+                        throw new AuthenticationException("unauthorized access ! ");
+                    }
                 }
                 throw new UserNotFoundException("User Not Found ! ");
-            }
-            throw new AuthenticationException("unauthorized access ! ");
         }catch (Exception ex){
             throw ex;
         }

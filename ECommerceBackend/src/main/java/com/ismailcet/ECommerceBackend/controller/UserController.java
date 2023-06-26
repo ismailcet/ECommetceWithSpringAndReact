@@ -41,12 +41,12 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<GetAllUsersResponse>> getAllUser(){
+    public ResponseEntity<List<UserDto>> getAllUser(){
             return ResponseEntity.ok(userService.getAllUser());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetUserByUserId> getUserByUserId(@PathVariable("id") Integer id){
+    public ResponseEntity<UserDto> getUserByUserId(@PathVariable("id") Integer id){
             return ResponseEntity.ok(userService.getUserByUserId(id));
     }
 

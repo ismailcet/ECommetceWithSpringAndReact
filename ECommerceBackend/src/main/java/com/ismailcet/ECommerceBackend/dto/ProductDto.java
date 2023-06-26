@@ -3,10 +3,7 @@ package com.ismailcet.ECommerceBackend.dto;
 import com.ismailcet.ECommerceBackend.entity.Category;
 import com.ismailcet.ECommerceBackend.entity.ProductImage;
 import com.ismailcet.ECommerceBackend.entity.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class ProductDto {
     private Integer id;
     private String photoUrl;
