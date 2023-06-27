@@ -49,7 +49,7 @@ public class Product {
             joinColumns = @JoinColumn(name="product_id"),
             inverseJoinColumns = @JoinColumn(name = "size_id")
     )
-    private Set<Size> sizesProduct = new HashSet<>();
+    private Set<Size> sizesProduct;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

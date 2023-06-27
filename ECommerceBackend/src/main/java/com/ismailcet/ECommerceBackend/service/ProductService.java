@@ -12,7 +12,9 @@ import com.ismailcet.ECommerceBackend.entity.ProductImage;
 import com.ismailcet.ECommerceBackend.entity.Product;
 import com.ismailcet.ECommerceBackend.entity.Size;
 import com.ismailcet.ECommerceBackend.exception.AuthenticationException;
+import com.ismailcet.ECommerceBackend.exception.CategoryNotFoundException;
 import com.ismailcet.ECommerceBackend.exception.ProductNotFoundException;
+import com.ismailcet.ECommerceBackend.exception.SizeNotFoundException;
 import com.ismailcet.ECommerceBackend.repository.CategoryRepository;
 import com.ismailcet.ECommerceBackend.repository.ProductRepository;
 import com.ismailcet.ECommerceBackend.repository.SizeRepository;
@@ -75,13 +77,17 @@ public class ProductService {
         }
     }
 
-    public ProductDto addSizeToProduct(Integer productId, Integer sizeId) {
+    public ProductDto addSizeToProduct(Integer productId, Integer sizeId)  {
         try{
             if(jwtFilter.isAdmin()){
                 Set<Size> sizes = new HashSet<>();
 
-                Size size = sizeRepository.findById(sizeId).get();
-                Product product = productRepository.findById(productId).get();
+                Size size =
+                        sizeRepository.findById(sizeId)
+                                .orElseThrow(()->new SizeNotFoundException("Size Not Found ! "));
+                Product product =
+                        productRepository.findById(productId)
+                                .orElseThrow(()-> new ProductNotFoundException("Product Not Found ! "));
 
                 sizes = product.getSizesProduct();
                 sizes.add(size);
@@ -99,9 +105,14 @@ public class ProductService {
         try{
             if(jwtFilter.isAdmin()){
                 Set<Category> categories = null;
-                Category category = categoryRepository.findById(categoryId).get();
 
-                Product product = productRepository.findById(productId).get();
+                Category category =
+                        categoryRepository.findById(categoryId)
+                                .orElseThrow(()->new CategoryNotFoundException("Category Not Found ! "));
+
+                Product product =
+                        productRepository.findById(productId)
+                                .orElseThrow(()-> new ProductNotFoundException("Product Not Found ! "));
                 categories = product.getCategoriesProduct();
                 categories.add(category);
                 product.setCategoriesProduct(categories);
