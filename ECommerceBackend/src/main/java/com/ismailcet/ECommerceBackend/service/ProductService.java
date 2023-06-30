@@ -128,18 +128,17 @@ public class ProductService {
     public ProductDto updateProductByProductId(Integer id, UpdateProductRequest updateProductRequest) {
         try{
             if(jwtFilter.isAdmin()){
+
                 Product product =
-                        productRepository.findById(id).get();
-                if(!Objects.isNull(product)){
-                    product.setName(updateProductRequest.getName());
-                    product.setPrice(updateProductRequest.getPrice());
-                    product.setColor(updateProductRequest.getColor());
-                    product.setPhotoUrl(updateProductRequest.getPhotoUrl());
-                    product.setStock(updateProductRequest.getStock());
-                    productRepository.save(product);
-                    return productDtoConverter.convert(product);
-                }
-                throw new ProductNotFoundException("Product Id does not exist");
+                        productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product Id does not exist"));
+
+                product.setName(updateProductRequest.getName());
+                product.setPrice(updateProductRequest.getPrice());
+                product.setColor(updateProductRequest.getColor());
+                product.setPhotoUrl(updateProductRequest.getPhotoUrl());
+                product.setStock(updateProductRequest.getStock());
+                productRepository.save(product);
+                return productDtoConverter.convert(product);
             }
             throw new AuthenticationException("Unauthenticated Access ! ");
         }catch (Exception ex){
@@ -151,12 +150,10 @@ public class ProductService {
         try{
             if(jwtFilter.isAdmin()){
                 Product product =
-                        productRepository.findById(id).get();
-                if(!Objects.isNull(product)){
-                    productRepository.deleteById(id);
-                    return "Product Successfully Deleted";
-                }
-                throw new ProductNotFoundException("Product Id does not exist !");
+                        productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product Id does not exist"));
+
+                productRepository.deleteById(id);
+                return "Product Successfully Deleted";
             }
             throw new AuthenticationException("Unauthorized Access ! ");
         }catch (Exception ex){

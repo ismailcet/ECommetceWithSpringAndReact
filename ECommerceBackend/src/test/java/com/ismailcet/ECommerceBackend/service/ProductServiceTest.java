@@ -4,6 +4,7 @@ import com.ismailcet.ECommerceBackend.JWT.JwtFilter;
 import com.ismailcet.ECommerceBackend.dto.ProductDto;
 import com.ismailcet.ECommerceBackend.dto.converter.ProductDtoConverter;
 import com.ismailcet.ECommerceBackend.dto.request.CreateProductRequest;
+import com.ismailcet.ECommerceBackend.dto.request.UpdateProductRequest;
 import com.ismailcet.ECommerceBackend.entity.Category;
 import com.ismailcet.ECommerceBackend.entity.Product;
 import com.ismailcet.ECommerceBackend.entity.Size;
@@ -167,7 +168,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddSizeToProduct_UserRoleIsAdminAndSizeIdIsExistAndProductIdIsExist_shouldSizeAddedSuccessfullyAndReturnProductDto(){
+    public void testAddSizeToProduct_whenUserRoleIsAdminAndSizeIdIsExistAndProductIdIsExist_shouldSizeAddedSuccessfullyAndReturnProductDto(){
         Integer sizeId = 1;
         Size size =Size.builder()
                 .id(1)
@@ -232,7 +233,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddSizeToProduct_UserRoleIsNotAdmin_shouldThrowAuthenticationException(){
+    public void testAddSizeToProduct_whenUserRoleIsNotAdmin_shouldThrowAuthenticationException(){
         Integer sizeId = 1;
         Integer productId = 1;
         AuthenticationException excepted =
@@ -250,7 +251,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddSizeToProduct_UserRoleIsAdminAndSizeIdIsNotExist_shouldThrowSizeNotFoundException(){
+    public void testAddSizeToProduct_whenUserRoleIsAdminAndSizeIdIsNotExist_shouldThrowSizeNotFoundException(){
         Integer sizeId = 1;
         Integer productId = 1;
 
@@ -269,7 +270,7 @@ class ProductServiceTest {
         verify(sizeRepository).findById(any(Integer.class));
     }
     @Test
-    public void testAddSizeToProduct_UserRoleIsAdminAndSizeIdIsExistAndProductIdIsNotExist_shouldThrowProductNotFoundException(){
+    public void testAddSizeToProduct_whenUserRoleIsAdminAndSizeIdIsExistAndProductIdIsNotExist_shouldThrowProductNotFoundException(){
         Integer sizeId = 1;
 
         Size size =Size.builder()
@@ -298,7 +299,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddCategoryToProduct_UserRoleIsAdminAndCategoryIdIsExistAndProductIdIsExist_shouldCategoryAddedSuccessfullyAndReturnProductDto(){
+    public void testAddCategoryToProduct_whenUserRoleIsAdminAndCategoryIdIsExistAndProductIdIsExist_shouldCategoryAddedSuccessfullyAndReturnProductDto(){
         Integer categoryId = 1;
         Category category =Category.builder()
                 .id(1)
@@ -363,7 +364,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddCategoryToProduct_UserRoleIsNotAdmin_shouldThrowAuthenticationException(){
+    public void testAddCategoryToProduct_whenUserRoleIsNotAdmin_shouldThrowAuthenticationException(){
         Integer categoryId = 1;
         Integer productId = 1;
         AuthenticationException excepted =
@@ -381,7 +382,7 @@ class ProductServiceTest {
 
     }
     @Test
-    public void testAddCategoryToProduct_UserRoleIsAdminAndCategoryIdIsNotExist_shouldThrowCategoryNotFoundException(){
+    public void testAddCategoryToProduct_whenUserRoleIsAdminAndCategoryIdIsNotExist_shouldThrowCategoryNotFoundException(){
         Integer categoryId = 1;
         Integer productId = 1;
 
@@ -400,7 +401,7 @@ class ProductServiceTest {
         verify(categoryRepository).findById(any(Integer.class));
     }
     @Test
-    public void testAddCategoryToProduct_UserRoleIsAdminAndCategoryIdIsExistAndProductIdNotExist_shouldThrowProductNotFoundException(){
+    public void testAddCategoryToProduct_whenUserRoleIsAdminAndCategoryIdIsExistAndProductIdNotExist_shouldThrowProductNotFoundException(){
         Integer categoryId = 1;
         Category category =Category.builder()
                 .id(1)
@@ -427,5 +428,215 @@ class ProductServiceTest {
         verify(productRepository).findById(any(Integer.class));
 
 
+    }
+    @Test
+    public void testUpdateProductByProductId_whenUserRoleIsAdminAndProductIdIsExist_shouldSuccessfullyUpdatedAndReturnProductDto(){
+        Integer productId = 1;
+        UpdateProductRequest given = UpdateProductRequest.builder()
+                .name("test-name-upd")
+                .price(15.5)
+                .color("test-color-upd")
+                .photoUrl("test-url-upd")
+                .stock(15)
+                .build();
+
+        Product product = Product.builder()
+                .name("test-name")
+                .price(15.5)
+                .color("test-color")
+                .photoUrl("test-url")
+                .stock(15)
+                .build();
+
+        Product result = Product.builder()
+                .name("test-name-upd")
+                .price(15.5)
+                .color("test-color-upd")
+                .photoUrl("test-url-upd")
+                .stock(15)
+                .build();
+
+        ProductDto excepted = ProductDto.builder()
+                .name("test-name-upd")
+                .price(15.5)
+                .color("test-color-upd")
+                .photoUrl("test-url-upd")
+                .stock(15)
+                .build();
+
+        when(jwtFilter.isAdmin()).thenReturn(true);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.save(result)).thenReturn(result);
+        when(productDtoConverter.convert(result)).thenReturn(excepted);
+
+        ProductDto actual =
+                productService.updateProductByProductId(productId, given);
+
+        assertEquals(excepted, actual);
+        assertEquals(given.getName(), actual.getName());
+        assertEquals(given.getColor(), actual.getColor());
+
+        verify(jwtFilter).isAdmin();
+        verify(productRepository).findById(any(Integer.class));
+        verify(productRepository).save(any(Product.class));
+        verify(productDtoConverter).convert(any(Product.class));
+    }
+    @Test
+    public void testUpdateProductByProductId_whenUserRoleIsNotAdmin_shouldThrowsAuthenticationException(){
+        Integer productId = 1;
+        UpdateProductRequest given = UpdateProductRequest.builder()
+                .name("test-name-upd")
+                .price(15.5)
+                .color("test-color-upd")
+                .photoUrl("test-url-upd")
+                .stock(15)
+                .build();
+        AuthenticationException excepted =
+                new AuthenticationException("Unauthenticated Access ! ");
+
+        when(jwtFilter.isAdmin()).thenReturn(false);
+
+        AuthenticationException actual = assertThrows(AuthenticationException.class,
+                ()-> productService.updateProductByProductId(productId, given));
+
+        assertEquals(excepted.getMessage(), actual.getMessage());
+        assertEquals(excepted.getClass(), actual.getClass());
+
+
+        verify(jwtFilter).isAdmin();
+    }
+    @Test
+    public void testUpdateProductByProductId_whenUserRoleIsAdminAndProductIdIsNotExist_shouldThrowProductNotFoundException(){
+        Integer productId = 1;
+        UpdateProductRequest given = UpdateProductRequest.builder()
+                .name("test-name-upd")
+                .price(15.5)
+                .color("test-color-upd")
+                .photoUrl("test-url-upd")
+                .stock(15)
+                .build();
+        
+        ProductNotFoundException excepted = 
+                new ProductNotFoundException("Product Id does not exist");
+        
+        when(jwtFilter.isAdmin()).thenReturn(true);
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        ProductNotFoundException actual = assertThrows(ProductNotFoundException.class,
+                ()->productService.updateProductByProductId(productId, given));
+
+        assertEquals(excepted.getMessage(), actual.getMessage());
+        assertEquals(excepted.getClass(), actual.getClass());
+
+
+        verify(jwtFilter).isAdmin();
+        verify(productRepository).findById(any(Integer.class));
+    }
+    @Test
+    public void testDeleteProductByProductId_whenUserRoleIsAdminAndProductIdIsExist_shouldDeleteSuccessfullyAndReturnString(){
+        Integer productId = 1;
+        Product product = Product.builder()
+                .name("test-name")
+                .price(15.5)
+                .color("test-color")
+                .photoUrl("test-url")
+                .stock(15)
+                .build();
+
+        String excepted = "Product Successfully Deleted";
+
+        when(jwtFilter.isAdmin()).thenReturn(true);
+        when(productRepository.findById(any(Integer.class))).thenReturn(Optional.of(product));
+        doNothing().when(productRepository).deleteById(any(Integer.class));
+
+        String actual =
+                productService.deleteProductByProductId(productId);
+
+        assertEquals(excepted, actual);
+
+        verify(jwtFilter).isAdmin();
+        verify(productRepository).findById(any(Integer.class));
+        verify(productRepository).deleteById(any(Integer.class));
+    }
+    @Test
+    public void testDeleteProductByProductId_whenUserRoleIsNotAdmin_shouldThrowsAuthenticationException(){
+        Integer productId = 1;
+        AuthenticationException excepted =
+                new AuthenticationException("Unauthorized Access ! ");
+
+        when(jwtFilter.isAdmin()).thenReturn(false);
+
+        AuthenticationException actual = assertThrows(AuthenticationException.class,
+                ()-> productService.deleteProductByProductId(productId));
+
+        assertEquals(excepted.getMessage(), actual.getMessage());
+        assertEquals(excepted.getClass(), actual.getClass());
+
+        verify(jwtFilter).isAdmin();
+    }
+    @Test
+    public void testDeleteProductByProductId_whenUserRoleIsAdminAndProductIdIsNotExist_shouldThrowProductNotFoundException(){
+        Integer productId = 1;
+        ProductNotFoundException excepted =
+                new ProductNotFoundException("Product Id does not exist");
+
+        when(jwtFilter.isAdmin()).thenReturn(true);
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        ProductNotFoundException actual = assertThrows(ProductNotFoundException.class,
+                ()->productService.deleteProductByProductId(productId));
+
+        assertEquals(excepted.getMessage(), actual.getMessage());
+        assertEquals(excepted.getClass(), actual.getClass());
+
+
+        verify(jwtFilter).isAdmin();
+        verify(productRepository).findById(any(Integer.class));
+    }
+    @Test
+    public void testGetProductByProductId_whenProductIdIsExist_shouldReturnProductDto(){
+        Integer productId = 1;
+        Product product = Product.builder()
+                .name("test-name")
+                .price(15.5)
+                .color("test-color")
+                .photoUrl("test-url")
+                .stock(15)
+                .build();
+
+        ProductDto excepted = ProductDto.builder()
+                .name("test-name")
+                .price(15.5)
+                .color("test-color")
+                .photoUrl("test-url")
+                .stock(15)
+                .build();
+        when(productRepository.findById(any(Integer.class))).thenReturn(Optional.of(product));
+        when(productDtoConverter.convert(any(Product.class))).thenReturn(excepted);
+
+        ProductDto actual =
+                productService.getProductByProductId(productId);
+        assertEquals(excepted, actual);
+        assertEquals(product.getName(), actual.getName());
+
+        verify(productRepository).findById(any(Integer.class));
+        verify(productDtoConverter).convert(any(Product.class));
+    }
+    @Test
+    public void testGetProductByProductId_whenProductIdIsNotExist_shouldThrowProductNotFoundException(){
+        Integer productId = 1;
+        ProductNotFoundException excepted =
+                new ProductNotFoundException("Product Not Found ! ");
+
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        ProductNotFoundException actual = assertThrows(ProductNotFoundException.class,
+                ()->productService.getProductByProductId(productId));
+
+        assertEquals(excepted.getMessage(), actual.getMessage());
+        assertEquals(excepted.getClass(), actual.getClass());
+
+
+        verify(productRepository).findById(any(Integer.class));
     }
 }
