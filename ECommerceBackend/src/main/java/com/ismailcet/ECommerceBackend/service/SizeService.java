@@ -57,7 +57,7 @@ public class SizeService {
                 if(size.isPresent()){
                     size.get().setName(updateSizeRequest.getName());
                     sizeRepository.save(size.get());
-                    throw new SizeNotFoundException("Size Successfully Updated ! ");
+                    return "Size Successfully Updated ! ";
                 }
                 throw new SizeNotFoundException("Size Id does not exist ! ");
             }
@@ -92,7 +92,7 @@ public class SizeService {
                                 .collect(Collectors.toList());
                 return sizes;
             }
-            throw new SizeNotFoundException("Size Not Found ! ");
+            throw new AuthenticationException("Unauthorized access.");
         }catch (Exception ex){
             throw ex;
         }
