@@ -34,7 +34,7 @@ public class OrderService {
     private final OrderDtoConverter converter;
     private final JwtFilter jwtFilter;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, OrderDtoConverter converter, JwtFilter jwtFilter) {
+    public OrderService (OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, OrderDtoConverter converter, JwtFilter jwtFilter) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
