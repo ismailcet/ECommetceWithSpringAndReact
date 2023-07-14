@@ -1,18 +1,14 @@
 package com.ismailcet.ECommerceBackend.service;
 
 import com.ismailcet.ECommerceBackend.JWT.JwtFilter;
-import com.ismailcet.ECommerceBackend.dto.OrderItemDtoResponse;
-import com.ismailcet.ECommerceBackend.dto.ProductDto;
-import com.ismailcet.ECommerceBackend.dto.UserDto;
+import com.ismailcet.ECommerceBackend.dto.*;
 import com.ismailcet.ECommerceBackend.dto.converter.OrderDtoConverter;
 import com.ismailcet.ECommerceBackend.dto.request.CreateOrderRequest;
-import com.ismailcet.ECommerceBackend.entity.CargoStatus;
-import com.ismailcet.ECommerceBackend.entity.OrderItem;
-import com.ismailcet.ECommerceBackend.entity.Product;
-import com.ismailcet.ECommerceBackend.entity.User;
+import com.ismailcet.ECommerceBackend.entity.*;
 import com.ismailcet.ECommerceBackend.repository.OrderRepository;
 import com.ismailcet.ECommerceBackend.repository.ProductRepository;
 import com.ismailcet.ECommerceBackend.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,6 +16,7 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -103,13 +100,62 @@ class OrderServiceTest {
         List<OrderItemDtoResponse> orderItemDtoResponses =
                 Arrays.asList(orderItemDtoResponse);
 
+        OrderItemDto orderItemDto = OrderItemDto.builder()
+                .productId(1)
+                .productId(1)
+                .quantity(1)
+                .build();
+
+        List<OrderItemDto> orderItemDtoList =
+                Arrays.asList(orderItemDto);
+
         CreateOrderRequest given = CreateOrderRequest.builder()
                 .createdDate(new Date())
                 .cargoStatus(CargoStatus.PENDING)
                 .address("test-address")
                 .amount(16.0)
-                .userId()
-                .orderItems()
+                .userId(1)
+                .orderItems(orderItemDtoList)
                 .build();
+
+        Order result = Order.builder()
+                .orderNumber("test-order-number")
+                .createdDate(new Date())
+                .cargoStatus(CargoStatus.PENDING)
+                .address("test-address")
+                .amount(16.0)
+                .user(user)
+                .orderItems(items)
+                .build();
+
+        OrderDto excepted = OrderDto.builder()
+                .createdDate(new Date())
+                .cargoStatus(CargoStatus.PENDING)
+                .address("test-address")
+                .amount(16.0)
+                .user(userDto)
+                .orderItems(orderItemDtoResponses)
+                .build();
+
+        when(jwtFilter.isUser()).thenReturn(true);
+        when(userRepository.findById(any(Integer.class))).thenReturn(Optional.of(user));
+        when(productRepository.findById(any(Integer.class))).thenReturn(Optional.of(product));
+        when(orderRepository.save(any(Order.class))).thenReturn(result);
+        when(orderDtoConverter.convert(any(Order.class))).thenReturn(any(OrderDto.class));
+
+
+        OrderDto actual =
+                orderService.createOrder(given);
+
+        assertEquals(excepted, actual);
+        assertEquals(excepted.getUser(), actual.getUser());
+        Assertions.assertIterableEquals(excepted.getOrderItems(), actual.getOrderItems());
+
+        verify(jwtFilter).isUser();
+        verify(userRepository).findById(any(Integer.class));
+        verify(productRepository).findById(any(Integer.class));
+        verify(orderRepository).save(any(Order.class));
+        verify(orderDtoConverter).convert(any(Order.class));
+
     }
 }
